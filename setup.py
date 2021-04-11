@@ -5,7 +5,7 @@ from setuptools import setup
 
 
 def setup_package():
-    install_requires = ['pymc3', 'torch', 'numpy', 'pandas', 'scanpy', 'plotnine', 'matplotlib', 'scipy', 'opencv-python', 'pyro-ppl']
+    install_requires = ['arviz<=0.11.0', 'pymc3>=3.8,<3.10', 'torch', 'numpy', 'pandas', 'scanpy', 'plotnine', 'matplotlib', 'scipy', 'opencv-python', 'pyro-ppl']
     metadata = dict(
         name='cell2location',
         version='0.05',
