@@ -261,10 +261,10 @@ def run_cell2location(sc_data, sp_data, model_name=None,
         cv = cv.sort_values(ascending=False)
         cell_state_df = cell_state_df.loc[cv[np.arange(summ_sc_data_args['select_n'])].index, :]
 
-        from autogenes import AutoGenes
-        ag = AutoGenes(cell_state_df.T)
-        ag.run(ngen=5000, seed=0, nfeatures=summ_sc_data_args['select_n_AutoGeneS'], mode='fixed')
-        pareto = ag.pareto
+        import autogene as ag
+        ag.init(cell_state_df.T, use_highly_variable=False, celltype_key="cluster")
+        ag.optimize(ngen=5000, seed=0, nfeatures=summ_sc_data_args['select_n_AutoGeneS'], mode="fixed")
+        pareto = ag.pareto()
         print(ag.plot(size='large', weights=(1, -1)))
         # We then pick one solution and filter its corresponding marker genes:
         cell_state_df = cell_state_df[pareto[len(pareto) - 1]]  # select the solution with min correlation
@@ -541,7 +541,7 @@ def run_cell2location(sc_data, sp_data, model_name=None,
                         clust_names = sp_data.uns['mod']['fact_names']
 
                         sp_data.obs[clust_names] = sp_data.obs[clust_names_orig]
-                        fig = sc.pl.spatial(sp_data[s_ind, :], cmap='magma',
+                        sc.pl.spatial(sp_data[s_ind, :], cmap='viridis',
                                             color=clust_names, ncols=5, library_id=s_spatial,
                                             size=export_args['scanpy_plot_size'], img_key=export_args['img_key'], alpha_img=0,
                                             vmin=0, vmax=export_args['scanpy_plot_vmax'],
@@ -549,26 +549,24 @@ def run_cell2location(sc_data, sp_data, model_name=None,
                                             show=False
                                             )
 
-                        fig.savefig(f"{fig_path}/spatial/W_mRNA_count_mean_{s}_{export_args['scanpy_plot_vmax']}"
+                        plt.savefig(f"{fig_path}/spatial/W_mRNA_count_mean_{s}_{export_args['scanpy_plot_vmax']}"
                                     f".{export_args['plot_extension']}",
                                     bbox_inches='tight')
-                        fig.clear()
-                        plt.close(fig)
+                        plt.close()
                         if show_locations:
                             plt.show()
 
-                        fig = sc.pl.spatial(sp_data[s_ind, :], cmap='magma',
+                        sc.pl.spatial(sp_data[s_ind, :], cmap='viridis',
                                             color=clust_names, ncols=5, library_id=s_spatial,
                                             size=export_args['scanpy_plot_size'], img_key=export_args['img_key'], alpha_img=1,
                                             vmin=0, vmax=export_args['scanpy_plot_vmax'],
                                             show=False,
                                             return_fig=True
                                             )
-                        fig.savefig(f"{fig_path}/spatial/histo_W_mRNA_count_mean_{s}_{export_args['scanpy_plot_vmax']}"
+                        plt.savefig(f"{fig_path}/spatial/histo_W_mRNA_count_mean_{s}_{export_args['scanpy_plot_vmax']}"
                                     f".{export_args['plot_extension']}",
                                     bbox_inches='tight')
-                        fig.clear()
-                        plt.close(fig)
+                        plt.close()
 
                         # Visualize cell type locations #####
                         # making copy to transform to log & assign nice names
@@ -576,31 +574,29 @@ def run_cell2location(sc_data, sp_data, model_name=None,
                         clust_names = sp_data.uns['mod']['fact_names']
                         sp_data.obs[clust_names] = (sp_data.obs[clust_names_orig])
 
-                        fig = sc.pl.spatial(sp_data[s_ind, :], cmap='magma',
+                        sc.pl.spatial(sp_data[s_ind, :], cmap='viridis',
                                             color=clust_names, ncols=5, library_id=s_spatial,
                                             size=export_args['scanpy_plot_size'], img_key=export_args['img_key'], alpha_img=0,
                                             vmin=0, vmax=export_args['scanpy_plot_vmax'],
                                             show=False,
                                             return_fig=True
                                             )
-                        fig.savefig(f"{fig_path}/spatial/W_cell_density_mean_{s}_{export_args['scanpy_plot_vmax']}."
+                        plt.savefig(f"{fig_path}/spatial/W_cell_density_mean_{s}_{export_args['scanpy_plot_vmax']}."
                                     f"{export_args['plot_extension']}",
                                     bbox_inches='tight')
-                        fig.clear()
-                        plt.close(fig)
+                        plt.close()
 
-                        fig = sc.pl.spatial(sp_data[s_ind, :], cmap='magma',
+                        sc.pl.spatial(sp_data[s_ind, :], cmap='viridis',
                                             color=clust_names, ncols=5, library_id=s_spatial,
                                             size=export_args['scanpy_plot_size'], img_key=export_args['img_key'], alpha_img=1,
                                             vmin=0, vmax=export_args['scanpy_plot_vmax'],
                                             show=False,
                                             return_fig=True
                                             )
-                        fig.savefig(f"{fig_path}/spatial/histo_W_cell_density_mean_{s}_{export_args['scanpy_plot_vmax']}"
+                        plt.savefig(f"{fig_path}/spatial/histo_W_cell_density_mean_{s}_{export_args['scanpy_plot_vmax']}"
                                     f".{export_args['plot_extension']}",
                                     bbox_inches='tight')
-                        fig.clear()
-                        plt.close(fig)
+                        plt.close()
 
                     if export_args['export_q05']:
                         # Visualize cell type locations - mRNA_count = nUMI #####
@@ -609,7 +605,7 @@ def run_cell2location(sc_data, sp_data, model_name=None,
                         clust_names = sp_data.uns['mod']['fact_names']
 
                         sp_data.obs[clust_names] = (sp_data.obs[clust_names_orig])
-                        fig = sc.pl.spatial(sp_data[s_ind, :], cmap='magma',
+                        sc.pl.spatial(sp_data[s_ind, :], cmap='viridis',
                                             color=clust_names, ncols=5, library_id=s_spatial,
                                             size=export_args['scanpy_plot_size'], img_key=export_args['img_key'],
                                             alpha_img=0,
@@ -617,13 +613,12 @@ def run_cell2location(sc_data, sp_data, model_name=None,
                                             show=False,
                                             return_fig=True
                                             )
-                        fig.savefig(f"{fig_path}/spatial/W_mRNA_count_q05_{s}_{export_args['scanpy_plot_vmax']}"
+                        plt.savefig(f"{fig_path}/spatial/W_mRNA_count_q05_{s}_{export_args['scanpy_plot_vmax']}"
                                     f".{export_args['plot_extension']}",
                                     bbox_inches='tight')
-                        fig.clear()
-                        plt.close(fig)
+                        plt.close()
 
-                        fig = sc.pl.spatial(sp_data[s_ind, :], cmap='magma',
+                        sc.pl.spatial(sp_data[s_ind, :], cmap='viridis',
                                             color=clust_names, ncols=5, library_id=s_spatial,
                                             size=export_args['scanpy_plot_size'], img_key=export_args['img_key'],
                                             alpha_img=1,
@@ -631,11 +626,10 @@ def run_cell2location(sc_data, sp_data, model_name=None,
                                             show=False,
                                             return_fig=True
                                             )
-                        fig.savefig(f"{fig_path}/spatial/histo_W_mRNA_count_q05_{s}_{export_args['scanpy_plot_vmax']}"
+                        plt.savefig(f"{fig_path}/spatial/histo_W_mRNA_count_q05_{s}_{export_args['scanpy_plot_vmax']}"
                                     f".{export_args['plot_extension']}",
                                     bbox_inches='tight')
-                        fig.clear()
-                        plt.close(fig)
+                        plt.close()
 
                         # Visualize cell type locations #####
                         # making copy to transform to log & assign nice names
@@ -643,7 +637,7 @@ def run_cell2location(sc_data, sp_data, model_name=None,
                         clust_names = sp_data.uns['mod']['fact_names']
                         sp_data.obs[clust_names] = (sp_data.obs[clust_names_orig])
 
-                        fig = sc.pl.spatial(sp_data[s_ind, :], cmap='magma',
+                        sc.pl.spatial(sp_data[s_ind, :], cmap='viridis',
                                             color=clust_names, ncols=5, library_id=s_spatial,
                                             size=export_args['scanpy_plot_size'], img_key=export_args['img_key'],
                                             alpha_img=0,
@@ -651,13 +645,12 @@ def run_cell2location(sc_data, sp_data, model_name=None,
                                             show=False,
                                             return_fig=True
                                             )
-                        fig.savefig(f"{fig_path}/spatial/W_cell_density_q05_{s}_{export_args['scanpy_plot_vmax']}"
+                        plt.savefig(f"{fig_path}/spatial/W_cell_density_q05_{s}_{export_args['scanpy_plot_vmax']}"
                                     f".{export_args['plot_extension']}",
                                     bbox_inches='tight')
-                        fig.clear()
-                        plt.close(fig)
+                        plt.close()
 
-                        fig = sc.pl.spatial(sp_data[s_ind, :], cmap='magma',
+                        sc.pl.spatial(sp_data[s_ind, :], cmap='viridis',
                                             color=clust_names, ncols=5, library_id=s_spatial,
                                             size=export_args['scanpy_plot_size'], img_key=export_args['img_key'],
                                             alpha_img=1,
@@ -665,11 +658,10 @@ def run_cell2location(sc_data, sp_data, model_name=None,
                                             show=False,
                                             return_fig=True
                                             )
-                        fig.savefig(f"{fig_path}/spatial/histo_W_cell_density_q05_{s}_{export_args['scanpy_plot_vmax']}"
+                        plt.savefig(f"{fig_path}/spatial/histo_W_cell_density_q05_{s}_{export_args['scanpy_plot_vmax']}"
                                     f".{export_args['plot_extension']}",
                                     bbox_inches='tight')
-                        fig.clear()
-                        plt.close(fig)
+                        plt.close()
 
                     rcParams["axes.facecolor"] = facecolor
 
